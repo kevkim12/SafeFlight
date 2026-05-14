@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/SafeFlight/static/css/main.f2a6d309.css",
-    "main.js": "/SafeFlight/static/js/main.5106b4fb.js",
+    "main.css": "/SafeFlight/static/css/main.dfd55d53.css",
+    "main.js": "/SafeFlight/static/js/main.368ca3bf.js",
     "index.html": "/SafeFlight/index.html",
-    "main.f2a6d309.css.map": "/SafeFlight/static/css/main.f2a6d309.css.map",
-    "main.5106b4fb.js.map": "/SafeFlight/static/js/main.5106b4fb.js.map"
+    "main.dfd55d53.css.map": "/SafeFlight/static/css/main.dfd55d53.css.map",
+    "main.368ca3bf.js.map": "/SafeFlight/static/js/main.368ca3bf.js.map"
   },
   "entrypoints": [
-    "static/css/main.f2a6d309.css",
-    "static/js/main.5106b4fb.js"
+    "static/css/main.dfd55d53.css",
+    "static/js/main.368ca3bf.js"
   ]
 }

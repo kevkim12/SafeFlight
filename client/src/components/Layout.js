@@ -77,7 +77,7 @@ import logo from "../assets/logo.png";
               <section className="footer-column">
                 <h3>Traveler Notes</h3>
                 <ul>
-                  <li>United States · English</li>
+                  <li>United States - English</li>
                   <li>Updated for practical trip planning</li>
                   <li>Use official advisories before departure</li>
                 </ul>
@@ -86,7 +86,7 @@ import logo from "../assets/logo.png";
           </div>
 
           <div className="footer-bottom">
-            <span>© 2026 Safe Flight</span>
+            <span>(c) 2026 Safe Flight</span>
             <span>Destination guidance for informed travel decisions.</span>
           </div>
         </footer>

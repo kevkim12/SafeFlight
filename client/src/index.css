@@ -852,6 +852,47 @@ input[type="checkbox"].table-checkbox {
   padding: 24px;
 }
 
+.auth-notice-page {
+  background: var(--surface-soft);
+  max-width: none;
+  padding-bottom: 48px;
+  padding-top: 64px;
+}
+
+.auth-notice-panel {
+  align-items: center;
+  display: grid;
+  gap: 48px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  margin: 0 auto;
+  max-width: 1120px;
+  min-height: 320px;
+  padding: 48px;
+}
+
+.auth-notice-panel h1 {
+  font-size: 48px;
+  line-height: 1.1;
+}
+
+.auth-notice-panel h2 {
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.auth-notice-panel p {
+  max-width: 620px;
+}
+
+.auth-notice-action {
+  border-left: 1px solid var(--hairline);
+  padding-left: 48px;
+}
+
+.auth-notice-action .button-primary {
+  margin-top: 16px;
+}
+
 .narrow-page {
   max-width: 760px;
 }
@@ -1041,6 +1082,7 @@ input[type="checkbox"].table-checkbox {
   .insight-section,
   .account-layout,
   .two-column-section,
+  .auth-notice-panel,
   .footer-content,
   .footer-columns {
     grid-template-columns: 1fr;
@@ -1170,6 +1212,17 @@ input[type="checkbox"].table-checkbox {
 
   .account-profile .button-secondary {
     margin-left: 0;
+  }
+
+  .auth-notice-panel {
+    padding: 32px 24px;
+  }
+
+  .auth-notice-action {
+    border-left: 0;
+    border-top: 1px solid var(--hairline);
+    padding-left: 0;
+    padding-top: 24px;
   }
 
   .footer-bottom {
