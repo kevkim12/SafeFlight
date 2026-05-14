@@ -59,6 +59,23 @@ safe-flight-website/
   docs/screenshots/   Portfolio screenshots used by this README
 ```
 
+## Deployment
+
+Safe Flight is deployed with GitHub Pages:
+
+[https://kevkim12.github.io/SafeFlight/](https://kevkim12.github.io/SafeFlight/)
+
+The production build uses the `homepage` value in `client/package.json` so static assets resolve from `/SafeFlight/`. Production routing uses hash-based routes, which keeps React Router navigation reliable on GitHub Pages.
+
+To update the deployed site:
+
+```bash
+cd client
+npm run build
+```
+
+After building, copy the contents of `client/build` to the repository root, keep `.nojekyll` and `404.html` in place, then commit and push the updated static files to `main`. The `gh-pages` branch can also be refreshed with the same `client/build` output when needed.
+
 ## Setup Instructions
 
 ### Prerequisites
