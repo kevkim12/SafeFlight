@@ -1,40 +1,110 @@
-<img width="225" height="71" alt="image" src="https://github.com/user-attachments/assets/51fd1593-a883-4351-b2c2-51b99a85e201" />
+# Safe Flight
 
-## Information
-Safe Flight is a web application built with React (JavaScript, HTML, CSS) on the front-end and Flask with Python on the back-end, utilizing MongoDB for data management. The application communicates seamlessly using JSON, and its logo was custom-designed in Adobe Photoshop.
+Safe Flight is a travel risk planning website that helps users review destination safety before booking or departing. The app presents country risk levels in a polished travel-service interface, supports searchable destination data, and lets users save countries to a personal watchlist with a regular email and password account.
 
-Safe Flight provides real-time travel safety insights, rating countries and continents on a scale from low risk to extremely high risk. Safety scores are calculated by integrating multiple APIs, including AirLabs and the Travel Advisory API, and take into account factors such as news trends and flight frequency to each destination, giving users a comprehensive view of travel safety.
+The current UI uses a modern corporate travel style with a dark navigation bar, strong editorial hero sections, clean data tables, country flag imagery, and responsive layouts for desktop and mobile.
 
-## Images
-<table>
-  <tr>
-    <td>
-      <img src="https://github.com/user-attachments/assets/0a98100f-fe8b-47de-b1cb-e129311c2d56" width="600" />
-      <p align="center">Home Page</p>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/369341c0-6c63-4235-9c4c-85f4eb623264" width="600" />
-      <p align="center">Country Risk Search</p>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://github.com/user-attachments/assets/06cce594-eae2-4e4e-a8f9-1fa2330829d6" width="600" />
-      <p align="center">Saved Places</p>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/6203fbd8-609b-42b1-b55c-0ffe73ee188a" width="600" />
-      <p align="center">Airport Safety Lookup</p>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://github.com/user-attachments/assets/7044b9c6-ade9-4544-b1fc-4c7ab0fcc6cd" width="600" />
-      <p align="center">Contact Page</p>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/da934944-0641-44de-a5ea-317288552bfa" width="600" />
-      <p align="center">About Page</p>
-    </td>
-  </tr>
-</table>
+## Features
+
+- Search and filter countries by destination name and risk level.
+- View destination risk categories with scannable badges.
+- Display country flags in the Risk Search table.
+- Save destinations to a personal watchlist.
+- Create and use a regular local account without OAuth.
+- Use fallback sample data when live advisory APIs are unavailable.
+- Responsive navigation, account, contact, and informational pages.
+
+## Technologies Used
+
+- React 18
+- React Router
+- Axios
+- CSS3
+- Inter web font
+- Web Crypto API
+- Local Storage
+- Python 3.11
+- Flask
+- PyMongo
+- MongoDB
+- Requests
+- python-decouple
+- AirLabs API
+- Travel Advisory API
+- Create React App
+- Pipenv
+
+## Screenshots
+
+The screenshots below show each primary page of the website.
+
+| Home | Risk Search |
+| --- | --- |
+| ![Safe Flight home page](docs/screenshots/safe-flight-home.png) | ![Safe Flight risk search page](docs/screenshots/safe-flight-risk-search.png) |
+
+| Watchlist | Account |
+| --- | --- |
+| ![Safe Flight watchlist page](docs/screenshots/safe-flight-watchlist.png) | ![Safe Flight account page](docs/screenshots/safe-flight-account.png) |
+
+| About | Contact |
+| --- | --- |
+| ![Safe Flight about page](docs/screenshots/safe-flight-about.png) | ![Safe Flight contact page](docs/screenshots/safe-flight-contact.png) |
+
+## Project Structure
+
+```text
+safe-flight-website/
+  client/             React frontend
+  server/             Flask API and MongoDB helpers
+  docs/screenshots/   Portfolio screenshots used by this README
+```
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js and npm
+- Python 3.11
+- Pipenv
+- MongoDB running locally on `mongodb://localhost:27017/`
+
+### Backend
+
+```bash
+cd server
+pipenv install
+pipenv run python server.py
+```
+
+Optional API environment variables can be added in `server/.env`:
+
+```bash
+AIRLABS=your_airlabs_api_key
+AIRLABS_BASE=https://airlabs.co/api/v9/
+TA_BASE=https://www.travel-advisory.info/api
+```
+
+If live API data is unavailable, the frontend still provides a working sample destination set for the Risk Search page.
+
+### Frontend
+
+```bash
+cd client
+npm install
+npm start
+```
+
+Open the app at:
+
+```text
+http://localhost:3000
+```
+
+### Production Build
+
+```bash
+cd client
+npm run build
+```
+
+The optimized build is generated in `client/build`.
