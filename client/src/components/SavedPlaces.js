@@ -1,6 +1,4 @@
 import React from "react";
-import {Table} from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 
 const SavedPlaces = () => {
@@ -10,17 +8,14 @@ const SavedPlaces = () => {
     const[status, setStatus] = React.useState('');
 
         React.useEffect(() => {
-            if (userData.length < 1) {
-                axios.get("/favouritesDB")
-                    .then(
-                        res => {
-                            // console.log(res)
-                            const favouritesData = res.data["data"];
-                            setUserData(favouritesData)
-                            setUserSearchData(favouritesData)
-                        }
-                    )
-            }
+            axios.get("/favouritesDB")
+                .then(
+                    res => {
+                        const favouritesData = res.data["data"];
+                        setUserData(favouritesData)
+                        setUserSearchData(favouritesData)
+                    }
+                )
         }, [])
 
     const handleSearch = () => {
@@ -35,8 +30,8 @@ const SavedPlaces = () => {
     const handleReset = () => {
             axios.post("/resetFavourites").then(
                 res => {
-                    const deletedData = res.data["data"]
                     setUserData([])
+                    setUserSearchData([])
                 }
             )
     }
@@ -52,34 +47,27 @@ const SavedPlaces = () => {
         return (<div><h1>Please log in to access this page.</h1></div>);
     } else {
         return (
-            <div>
-                <Table>
-                    <tr>
-                        <td>
-                            <input class="form-control" type='text' placeholder="Enter country..."
+            <main className="page-panel">
+                <div className="filter-bar">
+                            <input type='text' placeholder="Enter country..."
                                 onChange={(e) => setCountry(e.target.value)}/>
-                        </td>
-                        <td>
-                            <select className="form-control" onChange={(e) => setStatus(e.target.value)}>
+                            <select onChange={(e) => setStatus(e.target.value)}>
                                 <option value=''>-Select-</option>
                                 <option value='Low Risk'>Low Risk</option>
                                 <option value='Medium Risk'>Medium Risk</option>
                                 <option value='High Risk'>High Risk</option>
                                 <option value='Unknown'>Unknown</option>
                             </select>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-outline-primary" onClick={() => handleSearch()}>
+                            <button type="button" className="button-secondary" onClick={() => handleSearch()}>
                                 Search
                             </button>
-                            <button type="button" className="btn btn-outline-primary" onClick={() => handleReset()}>
+                            <button type="button" className="button-secondary" onClick={() => handleReset()}>
                                 Reset Favourites
                             </button>
-                        </td>
-                    </tr>
-                </Table>
+                </div>
 
-                <Table responsive stripped size="sm">
+                <div className="table-wrap">
+                <table className="data-table">
                     <thead>
                     <tr>
                         <th>Remove?</th>
@@ -93,7 +81,7 @@ const SavedPlaces = () => {
                     {
                         userSearchData && userSearchData.length > 0 ?
                             userSearchData.map(item =>
-                                <tr>
+                                <tr key={item._id}>
                                 <td>{<input type="checkbox" value = {JSON.stringify(item)}
                                                 onChange={(item) => handleFavouritePlace(item)}/>}</td>
                                     <td>{item._id}</td>
@@ -102,11 +90,12 @@ const SavedPlaces = () => {
                                     <td>{item.isStatusOveridden}</td>
                                 </tr>
                             )
-                            : 'No data'
+                            : <tr><td colSpan="5">No data</td></tr>
                     }
                     </tbody>
-                </Table>
-            </div>
+                </table>
+                </div>
+            </main>
         );
     }
 };

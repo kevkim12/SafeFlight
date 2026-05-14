@@ -1,6 +1,4 @@
 import React from "react";
-import {Table} from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 
 
@@ -12,17 +10,14 @@ const CS = () => {
     const[status, setStatus] = React.useState('');
 
         React.useEffect(() => {
-            if (userData.length < 1) {
-                axios.get("/countriesDB")
-                    .then(
-                        res => {
-                            // console.log(res)
-                            const countriesData = res.data["data"];
-                            setUserData(countriesData)
-                            setUserSearchData(countriesData)
-                        }
-                    )
-            }
+            axios.get("/countriesDB")
+                .then(
+                    res => {
+                        const countriesData = res.data["data"];
+                        setUserData(countriesData)
+                        setUserSearchData(countriesData)
+                    }
+                )
         }, [])
 
     const handleUpdateDB = () => {
@@ -57,34 +52,27 @@ const CS = () => {
         return (<div><h1>Please log in to access this page.</h1></div>);
     } else {
         return (
-            <div>
-                <Table>
-                    <tr>
-                        <td>
-                            <input class="form-control" type='text' placeholder="Enter country..."
+            <main className="page-panel">
+                <div className="filter-bar">
+                            <input type='text' placeholder="Enter country..."
                                    onChange={(e) => setCountry(e.target.value)}/>
-                        </td>
-                        <td>
-                            <select className="form-control" onChange={(e) => setStatus(e.target.value)}>
+                            <select onChange={(e) => setStatus(e.target.value)}>
                                 <option value=''>-Select-</option>
                                 <option value='Low Risk'>Low Risk</option>
                                 <option value='Medium Risk'>Medium Risk</option>
                                 <option value='High Risk'>High Risk</option>
                                 <option value='Unknown'>Unknown</option>
                             </select>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-outline-primary"
+                            <button type="button" className="button-secondary"
                                     onClick={() => handleSearch()}>Search
                             </button>
-                            <button type="button" class="btn btn-outline-primary"
+                            <button type="button" className="button-secondary"
                                     onClick={() => handleUpdateDB()}>Update Database!
                             </button>
-                        </td>
-                    </tr>
-                </Table>
+                </div>
 
-                <Table responsive stripped size="sm">
+                <div className="table-wrap">
+                <table className="data-table">
                     <thead>
                     <tr>
                         <th>Add to Favourites?</th>
@@ -97,7 +85,7 @@ const CS = () => {
                     {
                         userSearchData && userSearchData.length > 0 ?
                             userSearchData.map(item =>
-                                <tr>
+                                <tr key={item._id}>
                                     <td>{<input type="checkbox" value = {JSON.stringify(item)}
                                                 onChange={(item) => handleFavouritePlace(item)}/>}</td>
                                     <td>{item._id}</td>
@@ -105,12 +93,13 @@ const CS = () => {
                                     <td>{item.country_status}</td>
                                 </tr>
                             )
-                            : 'No data'
+                            : <tr><td colSpan="4">No data</td></tr>
                     }
                     </tbody>
-                </Table>
+                </table>
+                </div>
 
-            </div>
+            </main>
         );
     }
 };

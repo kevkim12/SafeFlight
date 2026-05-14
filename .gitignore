@@ -1,5 +1,12 @@
-.idea_backup
-.idea
+.idea/
+.idea_backup/
+
+client/node_modules/
+client/build/
+client/.env
+
 server/.env
+server/__pycache__/
+
 *.pack
-client/node_modules/.cache/default-development/15.pack
+*.pyc

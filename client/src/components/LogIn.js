@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import '../App.css'
 import jwt_decode from "jwt-decode";
-import Layout from "./Layout";
 
 const Login = () => {
     const [ user, setUser ] = useState({});
@@ -33,7 +31,6 @@ const Login = () => {
         if (userInStorage !== null && userInStorage !== "null" ) {
             const parsed = JSON.parse(userInStorage)["data"]
             setUser(parsed)
-            document.getElementById("signInDiv")
         } else {
             google.accounts.id.renderButton(
                 document.getElementById("signInDiv"),
@@ -48,18 +45,18 @@ const Login = () => {
     // If we have no user: sign in button
     // If we have a user: show the logout button
         return (
-            <div className="App">
+            <main className="page-panel account-page">
                 {<div id="signInDiv"></div>}
                 {localStorage.getItem("idToken") !== null && localStorage.getItem("idToken") !== "null" &&
-                    <button onClick={ (e) => handleSignOut(e)}>Sign Out</button>
+                    <button className="button-secondary" onClick={ (e) => handleSignOut(e)}>Sign Out</button>
                 }
                 { user &&
-                <div>
-                    <img src = {user.picture}></img>
-                    <h3>{user.Name}</h3>
+                <div className="account-profile">
+                    <img src = {user.picture} alt=""></img>
+                    <h3>{user.name}</h3>
                 </div>
                 }
-            </div>
+            </main>
         );
 
 
