@@ -47,16 +47,48 @@ import logo from "../assets/logo.png";
         <Outlet />
 
         <footer className="site-footer">
-          <div>
-            <h2>Safe Flight</h2>
-            <p>Destination risk tools for practical travel planning.</p>
+          <div className="footer-content">
+            <section className="footer-brand" aria-label="Safe Flight footer">
+              <p className="eyebrow">Safe Flight</p>
+              <h2>Travel with better context.</h2>
+              <p>
+                Country risk intelligence for travelers, families, and teams planning
+                where to go next.
+              </p>
+            </section>
+
+            <div className="footer-columns">
+              <section className="footer-column">
+                <h3>Travel Support</h3>
+                <ul>
+                  <li>Destination risk briefings</li>
+                  <li>Pre-trip country review</li>
+                  <li>Watchlist planning</li>
+                </ul>
+              </section>
+              <section className="footer-column">
+                <h3>Planning Tools</h3>
+                <ul>
+                  <li>Risk level comparison</li>
+                  <li>Saved destinations</li>
+                  <li>Email and password accounts</li>
+                </ul>
+              </section>
+              <section className="footer-column">
+                <h3>Traveler Notes</h3>
+                <ul>
+                  <li>United States · English</li>
+                  <li>Updated for practical trip planning</li>
+                  <li>Use official advisories before departure</li>
+                </ul>
+              </section>
+            </div>
           </div>
-          <nav aria-label="Footer navigation">
-            <NavLink to='/'>Home</NavLink>
-            <NavLink to='/countryRiskSearch'>Risk Search</NavLink>
-            <NavLink to='/savedPlaces'>Watchlist</NavLink>
-            <NavLink to='/about'>About</NavLink>
-          </nav>
+
+          <div className="footer-bottom">
+            <span>© 2026 Safe Flight</span>
+            <span>Destination guidance for informed travel decisions.</span>
+          </div>
         </footer>
       </>
     );
