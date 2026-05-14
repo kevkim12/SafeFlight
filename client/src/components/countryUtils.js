@@ -14,13 +14,7 @@ export const getRiskClass = (status = "Unknown") => {
   return status.toLowerCase().replace(/\s+/g, "-");
 };
 
-export const getCountryFlag = (countryCode = "") => {
-  const code = countryCode.toUpperCase().replace(/[^A-Z]/g, "");
-  if (code.length !== 2) {
-    return countryCode;
-  }
-
-  return String.fromCodePoint(
-    ...code.split("").map((letter) => 127397 + letter.charCodeAt(0))
-  );
+export const getCountryFlagUrl = (countryCode = "") => {
+  const code = countryCode.toLowerCase().replace(/[^a-z]/g, "");
+  return code.length === 2 ? `https://flagcdn.com/w40/${code}.png` : "";
 };

@@ -1,5 +1,24 @@
 import React from "react";
-import { getCountryFlag, getRiskClass } from "./countryUtils";
+import { getCountryFlagUrl, getRiskClass } from "./countryUtils";
+
+const CountryFlag = ({ code, countryName }) => {
+  const [failed, setFailed] = React.useState(false);
+  const flagUrl = getCountryFlagUrl(code);
+
+  if (!flagUrl || failed) {
+    return <span className="flag-fallback">{code || "NA"}</span>;
+  }
+
+  return (
+    <img
+      alt={`${countryName} flag`}
+      className="country-flag"
+      loading="lazy"
+      onError={() => setFailed(true)}
+      src={flagUrl}
+    />
+  );
+};
 
 const RiskTable = ({ countries, actionLabel, onAction, showOverride = false, emptyMessage }) => {
   return (
@@ -27,7 +46,9 @@ const RiskTable = ({ countries, actionLabel, onAction, showOverride = false, emp
                     onChange={(event) => onAction(event, item)}
                   />
                 </td>
-                <td className="flag-cell" title={item._id}>{getCountryFlag(item._id)}</td>
+                <td className="flag-cell" title={item._id}>
+                  <CountryFlag code={item._id} countryName={item.country_name} />
+                </td>
                 <td>{item.country_name}</td>
                 <td>
                   <span className={`risk-badge risk-${getRiskClass(item.country_status)}`}>

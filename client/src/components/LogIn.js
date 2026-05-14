@@ -46,7 +46,7 @@ const Login = () => {
       <section className="page-hero account-hero">
         <p className="eyebrow">Traveler account</p>
         <h1>Use Safe Flight with a regular account.</h1>
-        <p>Create an email and password account to save destinations without Google sign-in.</p>
+        <p>Create an email and password account to save destinations and return to them later.</p>
       </section>
 
       <section className="account-layout">
@@ -56,7 +56,7 @@ const Login = () => {
           <ul>
             <li>Save countries to your destination watchlist.</li>
             <li>Return to the same planning view later.</li>
-            <li>Use a regular account with no third-party sign-in dependency.</li>
+            <li>Use a regular email and password account.</li>
           </ul>
         </aside>
 

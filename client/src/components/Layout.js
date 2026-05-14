@@ -45,6 +45,19 @@ import logo from "../assets/logo.png";
         </nav>
 
         <Outlet />
+
+        <footer className="site-footer">
+          <div>
+            <h2>Safe Flight</h2>
+            <p>Destination risk tools for practical travel planning.</p>
+          </div>
+          <nav aria-label="Footer navigation">
+            <NavLink to='/'>Home</NavLink>
+            <NavLink to='/countryRiskSearch'>Risk Search</NavLink>
+            <NavLink to='/savedPlaces'>Watchlist</NavLink>
+            <NavLink to='/about'>About</NavLink>
+          </nav>
+        </footer>
       </>
     );
   };
