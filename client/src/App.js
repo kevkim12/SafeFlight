@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import About from "./components/About";
 import Home from "./components/Home";
@@ -9,8 +9,13 @@ import NoPage from "./components/NoPage";
 import SavedPlaces from "./components/SavedPlaces";
 
 export default function App() {
+    const Router = process.env.NODE_ENV === "production" ? HashRouter : BrowserRouter;
+    const routerProps = process.env.NODE_ENV === "production"
+        ? {}
+        : { basename: process.env.PUBLIC_URL || "/" };
+
     return (
-        <BrowserRouter basename={process.env.PUBLIC_URL || "/"}>
+        <Router {...routerProps}>
             <Routes>
                 <Route path="/" element={<Layout />}>
                     <Route index element={<Home />} />
@@ -22,6 +27,6 @@ export default function App() {
                     <Route path="*" element={<NoPage />} />
                 </Route>
             </Routes>
-        </BrowserRouter>
+        </Router>
     );
 }
