@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/SafeFlight/static/css/main.dfd55d53.css",
+    "main.js": "/SafeFlight/static/js/main.368ca3bf.js",
+    "index.html": "/SafeFlight/index.html",
+    "main.dfd55d53.css.map": "/SafeFlight/static/css/main.dfd55d53.css.map",
+    "main.368ca3bf.js.map": "/SafeFlight/static/js/main.368ca3bf.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dfd55d53.css",
+    "static/js/main.368ca3bf.js"
+  ]
+}
