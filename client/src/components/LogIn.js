@@ -1,65 +1,147 @@
-import { useEffect, useState } from "react";
-import jwt_decode from "jwt-decode";
+import { useState } from "react";
+import { createAccount, getCurrentUser, signIn, signOut } from "./auth";
+
+const emptyForm = {
+  name: "",
+  email: "",
+  password: "",
+};
 
 const Login = () => {
-    const [ user, setUser ] = useState({});
+  const [mode, setMode] = useState("signin");
+  const [form, setForm] = useState(emptyForm);
+  const [user, setUser] = useState(getCurrentUser);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-    function handleCallbackResponse(response) {
-        // console.log("Encoded JWT ID token: " + response.credential);
-        var userObject =jwt_decode(response.credential);
+  const updateForm = (field, value) => {
+    setForm((currentForm) => ({ ...currentForm, [field]: value }));
+  };
 
-        localStorage.setItem("idToken", response.credential);
-        localStorage.setItem("user", JSON.stringify({data: userObject}))
-        setUser(userObject);
-        document.getElementById("signInDiv").hidden = true;
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    try {
+      const nextUser = mode === "create"
+        ? await createAccount(form)
+        : await signIn(form);
+      setUser(nextUser);
+      setForm(emptyForm);
+      setMessage(mode === "create" ? "Account created. You are signed in." : "Welcome back.");
+    } catch (authError) {
+      setError(authError.message);
     }
+  };
 
-    function handleSignOut(event){
-        localStorage.setItem("idToken", "null")
-        localStorage.setItem("user", "null")
-        setUser(null);
-        document.getElementById("signInDiv").hidden = false;
-    }
+  const handleSignOut = () => {
+    signOut();
+    setUser(null);
+    setMessage("You have been signed out.");
+  };
 
-    useEffect(() => {
-        /* global google */
-        google.accounts.id.initialize({
-            client_id: "478098685389-liun3vb2lmc7o8rsdp8lor02i9fe04c8.apps.googleusercontent.com",
-            callback: handleCallbackResponse
-        });
-        const userInStorage = localStorage.getItem("user")
-        if (userInStorage !== null && userInStorage !== "null" ) {
-            const parsed = JSON.parse(userInStorage)["data"]
-            setUser(parsed)
-        } else {
-            google.accounts.id.renderButton(
-                document.getElementById("signInDiv"),
-                {theme: "outline", size: "large"}
-            );
-            google.accounts.id.prompt();
-        }
+  return (
+    <main className="content-page account-page-shell">
+      <section className="page-hero account-hero">
+        <p className="eyebrow">Traveler account</p>
+        <h1>Use Safe Flight with a regular account.</h1>
+        <p>Create an email and password account to save destinations without Google sign-in.</p>
+      </section>
 
+      <section className="account-layout">
+        <aside className="account-benefits">
+          <p className="eyebrow">Included</p>
+          <h2>Keep trip decisions organized.</h2>
+          <ul>
+            <li>Save countries to your destination watchlist.</li>
+            <li>Return to the same planning view later.</li>
+            <li>Use a regular account with no third-party sign-in dependency.</li>
+          </ul>
+        </aside>
 
+        <section className="account-panel">
+          {user ? (
+            <div className="account-profile">
+              <div className="profile-avatar" aria-hidden="true">
+                {user.name?.charAt(0).toUpperCase() || "S"}
+              </div>
+              <div>
+                <p className="eyebrow">Signed in</p>
+                <h2>{user.name || "Safe Flight traveler"}</h2>
+                <p>{user.email}</p>
+              </div>
+              <button className="button-secondary" type="button" onClick={handleSignOut}>
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="account-tabs" role="tablist" aria-label="Account options">
+                <button
+                  className={mode === "signin" ? "account-tab active" : "account-tab"}
+                  type="button"
+                  onClick={() => setMode("signin")}
+                >
+                  Sign in
+                </button>
+                <button
+                  className={mode === "create" ? "account-tab active" : "account-tab"}
+                  type="button"
+                  onClick={() => setMode("create")}
+                >
+                  Create account
+                </button>
+              </div>
 
-    }, []);
-    // If we have no user: sign in button
-    // If we have a user: show the logout button
-        return (
-            <main className="page-panel account-page">
-                {<div id="signInDiv"></div>}
-                {localStorage.getItem("idToken") !== null && localStorage.getItem("idToken") !== "null" &&
-                    <button className="button-secondary" onClick={ (e) => handleSignOut(e)}>Sign Out</button>
-                }
-                { user &&
-                <div className="account-profile">
-                    <img src = {user.picture} alt=""></img>
-                    <h3>{user.name}</h3>
+              <form className="account-form" onSubmit={handleSubmit}>
+                {mode === "create" && (
+                  <div className="form-row">
+                    <label htmlFor="name">Name</label>
+                    <input
+                      id="name"
+                      minLength="2"
+                      required
+                      type="text"
+                      value={form.name}
+                      onChange={(event) => updateForm("name", event.target.value)}
+                    />
+                  </div>
+                )}
+                <div className="form-row">
+                  <label htmlFor="email">Email</label>
+                  <input
+                    id="email"
+                    required
+                    type="email"
+                    value={form.email}
+                    onChange={(event) => updateForm("email", event.target.value)}
+                  />
                 </div>
-                }
-            </main>
-        );
+                <div className="form-row">
+                  <label htmlFor="password">Password</label>
+                  <input
+                    id="password"
+                    minLength="8"
+                    required
+                    type="password"
+                    value={form.password}
+                    onChange={(event) => updateForm("password", event.target.value)}
+                  />
+                </div>
+                <button className="button-primary" type="submit">
+                  {mode === "create" ? "Create account" : "Sign in"}
+                </button>
+              </form>
+            </>
+          )}
 
-
+          {error && <p className="status-message error-message">{error}</p>}
+          {message && <p className="status-message success-message">{message}</p>}
+        </section>
+      </section>
+    </main>
+  );
 };
 
 export default Login;

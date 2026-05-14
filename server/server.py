@@ -1,4 +1,3 @@
-import flask
 from flask import Flask, jsonify, request
 import api
 import mongoDB
@@ -8,95 +7,89 @@ import json
 app = Flask(__name__)
 
 
+def get_or_create_collection(name):
+    if name not in mongoDB.mydb.list_collection_names():
+        return mongoDB.createCollection(name)
+    return mongoDB.getCollection(name)
+
+
+def serialize_documents(cursor):
+    return json.loads(json_util.dumps(list(cursor)))
+
+
 @app.route('/')
 def hello_world():
-    return 'Hello'
+    return jsonify({"status": "Safe Flight API is running"})
 
 
 @app.route('/countriesDB', methods=["GET", "POST"])
 def countriesDB():
-    if ("countries" not in mongoDB.mydb.list_collection_names()):
-        mycol = mongoDB.createCollection("countries")
+    countries = get_or_create_collection("countries")
+    should_refresh = False
 
-    else:
-        mycol = mongoDB.getCollection("countries")
+    if request.method == 'POST':
+        request_body = request.get_json(silent=True) or {}
+        should_refresh = bool(request_body.get('data'))
+        if should_refresh:
+            countries.drop()
+            countries = mongoDB.createCollection("countries")
 
-    if request.method == 'POST':  # if the intent is to update the DB
-        isRestart = request.get_json()['data']
-        if (isRestart and "countries" in mongoDB.mydb.list_collection_names()):
-            mycol.drop()
-    else:  # if getting the database after clicking on loading tab for first time
-        x = mycol.find({})
-        if (mycol.count_documents({}) > 1):  # if the database already exists, load it instead of recreating it.
-            result = []
-            for y in x:
-                result += [y]
-            response = jsonify({"data": result})
-            return response
+    if not should_refresh and countries.count_documents({}) > 0:
+        return jsonify({"data": serialize_documents(countries.find({}))})
 
     api_result = api.getCountriesDB()
-    mongoResult = mycol.insert_many(json.loads(json_util.dumps(api_result)))
+    if api_result:
+        countries.insert_many(json.loads(json_util.dumps(api_result)))
 
-    x = mycol.find({})
-    result = []
-    for y in x:
-        result += [y]
-    response = jsonify({"data": result})
-    return response
-
-
-# @app.route('/warningLevel')
-# def warningLevel():
-#     result = api.getWarningLevel('US')
-#
-#     return result
+    return jsonify({"data": serialize_documents(countries.find({}))})
 
 
 @app.route("/addFavourites", methods=["POST"])
 def addFavourites():
-    request_data = request.get_json()["request_data"]
-    country_data = json.loads(request_data.get('data'))
-    isChecked = json.dumps(request_data.get("isChecked"))
+    request_body = request.get_json(silent=True) or {}
+    request_data = request_body.get("request_data", {})
+    country_payload = request_data.get('data', {})
+    country_data = json.loads(country_payload) if isinstance(country_payload, str) else country_payload
+    is_checked = bool(request_data.get("isChecked"))
 
-    if ("favourites" in mongoDB.mydb.list_collection_names()):
-        mycol = mongoDB.getCollection("favourites")
+    if not country_data or "_id" not in country_data:
+        return jsonify({"ok": False, "error": "Missing country data"}), 400
+
+    favourites = get_or_create_collection("favourites")
+
+    if is_checked:
+        favourites.update_one({"_id": country_data["_id"]}, {"$set": country_data}, upsert=True)
     else:
-        mycol = mongoDB.createCollection("favourites")
+        favourites.delete_one({"_id": country_data["_id"]})
 
-    if (isChecked == "true"):
-        mycol.insert_one(json.loads(json_util.dumps(country_data)))
-    else:
-        mycol.delete_one({"_id": country_data["_id"]})
+    countries = mongoDB.getCollection("countries")
+    if countries is not None:
+        marker_update = {"$set": {"inFavourites": True}} if is_checked else {"$unset": {"inFavourites": ""}}
+        countries.update_one({"_id": country_data["_id"]}, marker_update)
 
-    countriesCollection = mongoDB.getCollection("countries")
-    countriesCollection.update_one(country_data, {"$unset": {"inFavourites": 1}})
+    return jsonify({"ok": True})
 
-    return {}
 
-@app.route("/resetFavourites", methods = ["POST"])
+@app.route("/resetFavourites", methods=["POST"])
 def resetFavourites():
-    if ("favourites" in mongoDB.mydb.list_collection_names()):
-        mycol = mongoDB.getCollection("favourites")
-        countriesCollection = mongoDB.getCollection("countries")
-        documents = mycol.find({})
-        countriesCollection.update_many({"inFavourite": "true"}, {"$unset": {"inFavourite": 1}})
-        mycol.drop()
+    if "favourites" in mongoDB.mydb.list_collection_names():
+        mongoDB.getCollection("favourites").drop()
 
-    return {}
+    countries = mongoDB.getCollection("countries")
+    if countries is not None:
+        countries.update_many({"inFavourites": True}, {"$unset": {"inFavourites": ""}})
+
+    return jsonify({"ok": True})
+
 
 @app.route("/favouritesDB")
 def favouritesDB():
-    result = {}
-    if ("favourites" in mongoDB.mydb.list_collection_names()):
-        result = []
-        mycol = mongoDB.getCollection("favourites")
-        x = mycol.find({})
-        for y in x:
-            result += [y]
-        result = jsonify({"data": result})
-    return result
+    if "favourites" not in mongoDB.mydb.list_collection_names():
+        return jsonify({"data": []})
+
+    favourites = mongoDB.getCollection("favourites")
+    return jsonify({"data": serialize_documents(favourites.find({}))})
 
 
 if __name__ == '__main__':
-    # app.run(host='localhost', port=5000)
     app.run(debug=True)

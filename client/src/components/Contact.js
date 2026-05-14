@@ -1,22 +1,20 @@
 import React from "react";
 
 const Contact = () => {
-    const [formStatus, setFormStatus] = React.useState('Send')
+    const [formStatus, setFormStatus] = React.useState('Send message')
   const onSubmit = (e) => {
     e.preventDefault()
-    setFormStatus('Submitting...')
-    const { name, email, message } = e.target.elements
-    let conFom = {
-      name: name.value,
-      email: email.value,
-      message: message.value,
-    }
-    console.log(conFom)
+    setFormStatus('Message noted')
+    e.target.reset()
   }
     return (
-        <main className="page-panel contact-page">
-        <h2>Contact Us</h2>
-        <form onSubmit={onSubmit}>
+        <main className="content-page">
+        <section className="page-hero compact-hero">
+          <p className="eyebrow">Contact</p>
+          <h1>Questions about a destination or saved country list?</h1>
+          <p>Send a note to the Safe Flight team and we will review it.</p>
+        </section>
+        <form className="contact-form" onSubmit={onSubmit}>
           <div className="form-row">
             <label htmlFor="name">
               Name

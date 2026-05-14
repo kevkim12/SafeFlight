@@ -1,111 +1,111 @@
-import requests  # used to make requests to Airlabs
-import json  # used to parse a json to an object or vice versa after api call.
-from decouple import config  # used to store secret keys in .env file
+import requests
+from decouple import config
 
 AIRLABS = config("AIRLABS", default='')
 AIRLABS_BASE = config("AIRLABS_BASE", default='')
 TA_BASE = config('TA_BASE', default='')
+REQUEST_TIMEOUT = 15
 
 
-# api_result = requests.get(api_base+method, params)
-# api_response = api_result.json()
 def getStatus(current_advisory):
-    currentWarningLevel = current_advisory['advisory']['score']
-    if (currentWarningLevel < 2.5):
-        country_status = 'Low Risk'
-    elif (currentWarningLevel < 3.5):
-        country_status = 'Medium Risk'
-    elif (currentWarningLevel < 4.5):
-        country_status = 'High Risk'
-    else:  # (currentWarningLevel >= 4.5):
-        country_status = 'Extreme Warning'
-    return country_status
+    score = current_advisory.get('advisory', {}).get('score')
+    if score is None:
+        return 'Unknown'
+    if score < 2.5:
+        return 'Low Risk'
+    if score < 3.5:
+        return 'Medium Risk'
+    if score < 4.5:
+        return 'High Risk'
+    return 'Extreme Warning'
+
+
+def get_airlabs_response(endpoint, params=None):
+    if not AIRLABS_BASE:
+        return []
+
+    try:
+        response = requests.get(
+            f"{AIRLABS_BASE}{endpoint}",
+            {**(params or {}), 'api_key': AIRLABS},
+            timeout=REQUEST_TIMEOUT,
+        )
+        response.raise_for_status()
+        return response.json().get("response", [])
+    except requests.RequestException:
+        return []
 
 
 def getCountriesDB():
     """
-    :return: returns an array of json/dictionary-like elements.
+    Returns country risk documents suitable for MongoDB insertion.
     """
-    params = {
-        'api_key': AIRLABS
-    }
-    api_response = requests.get(AIRLABS_BASE + 'countries', params).json()["response"]  # returns array with airport
+    countries = get_airlabs_response('countries')
+    advisory_cache = {}
     returned_list = []
-    countryAdvisoryInfo = {}
-    for i in range(len(api_response)):
-        country_elem = api_response[i]
+
+    for country_elem in countries:
         country_code = country_elem.get("code")
         country_name = country_elem.get("name")
-        if (country_code in countryAdvisoryInfo):
-            country_status = countryAdvisoryInfo[country_code]['status']
-        else:
-            country_status = "Unknown"
-            currentAdvisory = getWarningLevel(country_code)
-            if (currentAdvisory):
-                country_status = getStatus(currentAdvisory)
+        if not country_code or not country_name:
+            continue
 
-        country_dict = {"country_name": country_name, "_id": country_code, "country_status": country_status}
-        returned_list += [country_dict]
-    return (returned_list)
+        if country_code not in advisory_cache:
+            current_advisory = getWarningLevel(country_code)
+            advisory_cache[country_code] = getStatus(current_advisory) if current_advisory else "Unknown"
+
+        returned_list.append({
+            "country_name": country_name,
+            "_id": country_code,
+            "country_status": advisory_cache[country_code],
+        })
+
+    return returned_list
 
 
 def getAirportsDB():
     """
-    This function gets all airports from Airlabs and adds the country names to them.
-    sample output if my paramaters were {'api_key': AIRLABS, 'iata_code': 'BOS'} would be
-    [{'name': 'Logan International Airport', 'iata_code': 'BOS', 'country': 'United States'}]
-    :return: returns an array of json/dictionary-like elements.
+    Returns airports enriched with country names and country risk status.
     """
-    params = {
-        'api_key': AIRLABS
-    }
-    api_response = requests.get(AIRLABS_BASE + 'airports', params).json()["response"]  # returns array with airport
+    airports = get_airlabs_response('airports')
+    country_cache = {}
     returned_list = []
-    countryAdvisoryInfo = {}
-    for i in range(len(api_response)):
-        airport_elem = api_response[i]
-        current_country_code = airport_elem.get("country_code")
-        if (current_country_code in countryAdvisoryInfo):
-            currentStatus = countryAdvisoryInfo[current_country_code]['status']
-            currentCountryName = countryAdvisoryInfo[current_country_code]['name']
-        else:
-            currentStatus = "Unknown"
-            currentAdvisory = getWarningLevel(current_country_code)
-            if (not currentAdvisory):  # if travel advisory could not find country
-                currentWarningLevel = -1
-                params['code'] = current_country_code
-                currentCountryName = requests.get(AIRLABS_BASE + 'countries', params).json()["response"][0]['name']
-                params.pop('code')  # removing country_code used to get name from airlabs
-            else:
-                currentWarningLevel = currentAdvisory['advisory']['score']
-                currentCountryName = currentAdvisory['name']
-                if (currentWarningLevel < 2.5):
-                    currentStatus = 'Low Risk'
-                elif (currentWarningLevel < 3.5):
-                    currentStatus = 'Medium Risk'
-                elif (currentWarningLevel < 4.5):
-                    currentStatus = 'High Risk'
-                elif (currentWarningLevel >= 4.5):
-                    currentStatus = 'Extreme Warning'
-            countryAdvisoryInfo[current_country_code] = {'status': currentStatus, 'name': currentCountryName}
 
-        airport_dict = {"airport": airport_elem.get("name"), "iata_code": airport_elem.get('iata_code'),
-                        "country": currentCountryName, "status": currentStatus
-                        }
-        returned_list += [airport_dict]
-    return (returned_list)
+    for airport_elem in airports:
+        country_code = airport_elem.get("country_code")
+        if country_code not in country_cache:
+            advisory = getWarningLevel(country_code)
+            country_cache[country_code] = {
+                "name": advisory.get("name") if advisory else getCountryName(country_code),
+                "status": getStatus(advisory) if advisory else "Unknown",
+            }
+
+        country_info = country_cache[country_code]
+        returned_list.append({
+            "airport": airport_elem.get("name"),
+            "iata_code": airport_elem.get('iata_code'),
+            "country": country_info["name"],
+            "status": country_info["status"],
+        })
+
+    return returned_list
+
+
+def getCountryName(country_code):
+    countries = get_airlabs_response('countries', {'code': country_code})
+    if not countries:
+        return "Unknown"
+    return countries[0].get("name", "Unknown")
 
 
 def getWarningLevel(country_code):
-    if (country_code and len(country_code) > 0):
-        url_rest = '?countrycode=' + country_code
-        result = requests.get(TA_BASE + url_rest)
-        # print(result.status_code)
-        if (result.status_code != 200):
-            result = {}
-        else:
-            result = result.json()["data"][country_code]
-    else:
-        result = {}
-    # print(result)
-    return result
+    if not country_code or not TA_BASE:
+        return {}
+
+    try:
+        result = requests.get(TA_BASE, params={'countrycode': country_code}, timeout=REQUEST_TIMEOUT)
+        if result.status_code != 200:
+            return {}
+        return result.json().get("data", {}).get(country_code, {})
+    except requests.RequestException:
+        return {}

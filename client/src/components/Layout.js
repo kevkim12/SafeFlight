@@ -23,20 +23,23 @@ import logo from "../assets/logo.png";
             <span></span>
           </button>
           <div className={menuOpen ? "nav-menu nav-menu-open" : "nav-menu"}>
-          <NavLink to='/CountryRiskSearch' onClick={() => setMenuOpen(false)}>
-              Country Risk Search
+          <NavLink to='/' onClick={() => setMenuOpen(false)}>
+              Home
             </NavLink>
-          <NavLink to='/SavedPlaces' onClick={() => setMenuOpen(false)}>
-          Saved Places
+          <NavLink to='/countryRiskSearch' onClick={() => setMenuOpen(false)}>
+              Risk Search
             </NavLink>
-            <NavLink to='/About' onClick={() => setMenuOpen(false)}>
+          <NavLink to='/savedPlaces' onClick={() => setMenuOpen(false)}>
+          Watchlist
+            </NavLink>
+            <NavLink to='/about' onClick={() => setMenuOpen(false)}>
               About
             </NavLink>
-            <NavLink to='/Contact' onClick={() => setMenuOpen(false)}>
+            <NavLink to='/contact' onClick={() => setMenuOpen(false)}>
               Contact
             </NavLink>
           </div>
-          <NavLink className="account-link" to='/LogIn' id="logInButton" onClick={() => setMenuOpen(false)}>
+          <NavLink className="account-link" to='/login' id="logInButton" onClick={() => setMenuOpen(false)}>
               Account
           </NavLink>
         </nav>
